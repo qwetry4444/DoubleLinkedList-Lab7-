@@ -12,9 +12,17 @@ public:
 	void Print() const override;
 	void Input() override;
 	ItemType Type() const override { return itPlanet; };
-	bool Compare(class Base*) const override;
 
 	bool operator > (Base&) override;
+
+	bool operator >= (int) override {
+		return false;
+	}
+	bool operator <= (int) override {
+		return false;
+	}
+
+	//bool operator == (Base&) override;
 
 	friend class SubjList;
 };
@@ -30,11 +38,12 @@ public:
 	void Print() const override;
 	void Input() override;
 	ItemType Type() const override { return itStar; };
-	bool Compare(class Base*) const override;
 
 	bool operator > (Base&) override;
-	bool operator >= (int);
-	bool operator <= (int);
+
+	bool operator >= (int) override;
+	bool operator <= (int) override;
+	//bool operator == (Base&) override;
 
 	friend class SubjList;
 };
@@ -44,10 +53,22 @@ bool Planet::operator > (Base& objNext)
 	switch (objNext.Type()) {
 	case itStar:
 		return true;
+		break;
 	case itPlanet:
 		return this->orbitalDiameter > ((Planet&)objNext).orbitalDiameter;
+		break;
 	}
 }
+
+//bool Planet::operator == (Base& objNext) {
+//	switch (objNext.Type())
+//	{
+//	case itPlanet:
+//		return false;
+//	case itStar:
+//		return (systemOfStar == ((Star&)objNext).name);
+//	}
+//}
 
 Planet::Planet()
 	: Base()
@@ -78,15 +99,6 @@ void Planet::Input()
 	cin >> orbitalDiameter;
 }
 
-//bool Planet::Compare(class Base* baseNext) const
-//{
-//	switch (baseNext->Type()) {
-//	case itStar:
-//		return true;
-//	case itPlanet:
-//		return (this->orbitalDiameter > ((Planet*)baseNext)->orbitalDiameter);
-//	}
-//}
 
 Star::Star()
 	: Base()
@@ -100,8 +112,10 @@ bool Star::operator > (Base& objNext)
 	switch (objNext.Type()) {
 	case itPlanet:
 		return false;
+		break;
 	case itStar:
 		return (name > ((Star&)objNext).name);
+		break;
 	}
 }
 
@@ -113,6 +127,15 @@ bool Star::operator <= (int num) {
 	return distanceFromEarth <= num;
 }
 
+//bool Star::operator == (Base& baseNext) {
+//	switch (baseNext.Type())
+//	{
+//	case itStar:
+//		return false;
+//	case itPlanet:
+//		return name == baseNext.systemOfStar;
+//	}
+//}
 
 void Star::Print() const
 {
@@ -137,16 +160,6 @@ void Star::Input()
 	cout << "Enter distance from Earth: ";
 	cin >> distanceFromEarth;
 }
-
-//bool Star::Compare(class Base* baseNext) const
-//{
-//	switch (baseNext->Type()) {
-//	case itStar:
-//		return (name > ((Star*)baseNext)->name);
-//	case itPlanet:
-//		return false;
-//	}
-//}
 
 Base::Base()
 	: name("")
@@ -176,11 +189,16 @@ Base* Base::Create(enum ItemType _type) {
 	return base;
 }
 
+bool Base::operator == (string _name) {
+	return name == _name;
+}
+
 void SubjList::PrintList() {
+	SubjList& L = *this;
 	if (this) {
 		if (Head()) {
-			for (Base* p = (Base*)Head(); p; p = (Base*)p->next) {
-				p->Print();
+			for (int i = 0; i < Count(); i++) {
+				L[i].Print();
 			}
 		}
 		else
@@ -210,7 +228,7 @@ void SubjList::SearchByName(string _name) {
 		if (Head()) {
 			Base* p = (Base*)Head();
 			while (p) {
-				if (p->name == _name) {
+				if (*p == _name) {
 					p->Print();
 				}
 				p = (Base*)p->next;
@@ -223,12 +241,12 @@ void SubjList::SearchByName(string _name) {
 		cout << "ERROR: wrong list!" << endl;
 }
 
-void SubjList::SearchByDiapasone(double diapasoneStart, double diapasoneEnd) {
+void SubjList::SearchByDiapasone(int diapasoneStart, int diapasoneEnd) {
 	if (this) {
 		if (Head()) {
 			Base* p = (Base*)Head();
 			while (p) {
-				if (p->Type() == itStar && ((Star&)p) >= diapasoneStart && ((Star&)p) <= diapasoneEnd)
+				if (*p >= diapasoneStart && *p <= diapasoneEnd)
 					p->Print();
 				p = (Base*)p->next;
 			}
@@ -262,27 +280,27 @@ void SubjList::SortByTypes(int listLen) {
 	} while (flag == 1);
 }
 
+
 void SubjList::Sort() {
-	SubjList L = *this;
+	SubjList& L = *this;
 	int i, j;
 	int countPlanetsInSystem;
 	Planet* planetToMove;
 	int listLen = Count();
 	SortByTypes(listLen);
-
-	for (i = 0; i < listLen; i++) {
-		if (L[i].Type() == itStar) {
-			countPlanetsInSystem = 0;
-			for (j = i + 1; j < listLen; j++) {
-				if (L[j].Type() != itPlanet)
-					continue;
-				if (L[i].name == ((Planet&)L[j]).systemOfStar)
-				{
-					planetToMove = (Planet*)Remove(j);
-					Insert(planetToMove, i + 1 + countPlanetsInSystem);
-					countPlanetsInSystem++;
-				}
-			}
-		}
-	}
+	//for (i = 0; i < listLen; i++) {
+	//	if (L[i].Type() == itStar) {
+	//		countPlanetsInSystem = 0;
+	//		for (j = i + 1; j < listLen; j++) {
+	//			if (L[j].Type() == itStar)
+	//				continue;
+	//			if (L[i].name == ((Planet&)L[j]).systemOfStar)
+	//			{
+	//				planetToMove = (Planet*)Remove(j);
+	//				Insert(planetToMove, i + 1 + countPlanetsInSystem);
+	//				countPlanetsInSystem++;
+	//			}
+	//		}
+	//	}
+	//}
 }

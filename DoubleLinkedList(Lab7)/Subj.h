@@ -25,12 +25,17 @@ public:
 	virtual void Print() const = 0;
 	virtual void Input() = 0;
 
-	virtual bool Compare(class Base*) const = 0;
 	virtual ItemType Type() const { return itNone; };
 
 	static Base* Create(enum ItemType type);
 
 	virtual bool operator > (Base& obj1) = 0;
+
+	virtual bool operator >= (int) = 0;
+	virtual bool operator <= (int) = 0;
+	//virtual bool operator == (Base&) = 0;
+	bool operator == (string name);
+
 
 	friend class SubjList;
 };
@@ -41,7 +46,7 @@ public:
 	void PrintList();
 	void PrintByType(enum ItemType type);
 	void SearchByName(string name);
-	void SearchByDiapasone(double distanceStart, double distanceEnd);
+	void SearchByDiapasone(int distanceStart, int distanceEnd);
 	void Swap(int i, int j);
 	void SortByTypes(int listLen);
 	void Sort();
