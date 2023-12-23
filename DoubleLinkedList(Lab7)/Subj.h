@@ -29,13 +29,12 @@ public:
 
 	static Base* Create(enum ItemType type);
 
-	virtual bool operator > (Base& obj1) = 0;
+	virtual bool operator > (Base& obj2) = 0;
 
 	virtual bool operator >= (int) = 0;
 	virtual bool operator <= (int) = 0;
-	//virtual bool operator == (Base&) = 0;
+	virtual bool operator == (Base& obj2) = 0;
 	bool operator == (string name);
-
 
 	friend class SubjList;
 };

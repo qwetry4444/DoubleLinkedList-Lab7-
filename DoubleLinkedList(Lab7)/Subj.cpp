@@ -22,8 +22,9 @@ public:
 		return false;
 	}
 
-	//bool operator == (Base&) override;
+	bool operator == (Base&) override;
 
+	friend class Star;
 	friend class SubjList;
 };
 
@@ -43,32 +44,33 @@ public:
 
 	bool operator >= (int) override;
 	bool operator <= (int) override;
-	//bool operator == (Base&) override;
+	bool operator == (Base&) override;
 
+	friend class Planet;
 	friend class SubjList;
 };
 
 bool Planet::operator > (Base& objNext)
 {
-	switch (objNext.Type()) {
+	switch (objNext.Type()) 
+	{
 	case itStar:
 		return true;
-		break;
 	case itPlanet:
-		return this->orbitalDiameter > ((Planet&)objNext).orbitalDiameter;
-		break;
+		return (this->orbitalDiameter > ((Planet&)objNext).orbitalDiameter);
 	}
 }
 
-//bool Planet::operator == (Base& objNext) {
-//	switch (objNext.Type())
-//	{
-//	case itPlanet:
-//		return false;
-//	case itStar:
-//		return (systemOfStar == ((Star&)objNext).name);
-//	}
-//}
+bool Planet::operator == (Base& objNext) 
+{
+	switch (objNext.Type())
+	{
+	case itPlanet:
+		return false;
+	case itStar:
+		return (this->systemOfStar == ((Star&)objNext).name);
+	}
+}
 
 Planet::Planet()
 	: Base()
@@ -112,10 +114,8 @@ bool Star::operator > (Base& objNext)
 	switch (objNext.Type()) {
 	case itPlanet:
 		return false;
-		break;
 	case itStar:
 		return (name > ((Star&)objNext).name);
-		break;
 	}
 }
 
@@ -127,15 +127,15 @@ bool Star::operator <= (int num) {
 	return distanceFromEarth <= num;
 }
 
-//bool Star::operator == (Base& baseNext) {
-//	switch (baseNext.Type())
-//	{
-//	case itStar:
-//		return false;
-//	case itPlanet:
-//		return name == baseNext.systemOfStar;
-//	}
-//}
+bool Star::operator == (Base& baseNext) {
+	switch (baseNext.Type())
+	{
+	case itStar:
+		return false;
+	case itPlanet:
+		return name == ((Planet&)baseNext).systemOfStar;
+	}
+}
 
 void Star::Print() const
 {
@@ -265,12 +265,13 @@ void SubjList::Swap(int i, int j) {
 
 void SubjList::SortByTypes(int listLen) {
 	int i;
-	int flag;
+	int flag = 1;
 	do {
 		Base* p = (Base*)head;
 		flag = 0;
 		for (i = 0; i < listLen - 1; i++) {
-			if (p > p->next) {
+			Base* obj2 = (Base*)p->next;
+			if (*p > *obj2) {
 				Swap(i, i + 1);
 				flag = 1;
 			}
@@ -288,19 +289,19 @@ void SubjList::Sort() {
 	Planet* planetToMove;
 	int listLen = Count();
 	SortByTypes(listLen);
-	//for (i = 0; i < listLen; i++) {
-	//	if (L[i].Type() == itStar) {
-	//		countPlanetsInSystem = 0;
-	//		for (j = i + 1; j < listLen; j++) {
-	//			if (L[j].Type() == itStar)
-	//				continue;
-	//			if (L[i].name == ((Planet&)L[j]).systemOfStar)
-	//			{
-	//				planetToMove = (Planet*)Remove(j);
-	//				Insert(planetToMove, i + 1 + countPlanetsInSystem);
-	//				countPlanetsInSystem++;
-	//			}
-	//		}
-	//	}
-	//}
+	for (i = 0; i < listLen; i++) {
+		if (L[i].Type() == itStar) {
+			countPlanetsInSystem = 0;
+			for (j = i + 1; j < listLen; j++) {
+				if (L[j].Type() == itStar)
+					continue;
+				if (L[i] == L[j])
+				{
+					planetToMove = (Planet*)Remove(j);
+					Insert(planetToMove, i + 1 + countPlanetsInSystem);
+					countPlanetsInSystem++;
+				}
+			}
+		}
+	}
 }
